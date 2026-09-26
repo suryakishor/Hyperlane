@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#070b18" />
+    <meta
+      name="description"
+      content="Hyperlane - an original browser based 3D endless runner. Dodge barriers, slide under gates and collect flux cells across an endless neon skyway."
+    />
+    <title>Hyperlane</title>
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <div id="app">
+      <canvas id="game-canvas" aria-label="Hyperlane 3D game view"></canvas>
+
+      <div id="ui-root">
+        <!-- ================= LOADING ================= -->
+        <section id="screen-loading" class="screen screen--solid" data-screen="loading">
+          <div class="loader">
+            <div class="loader__mark" aria-hidden="true">
+              <span></span><span></span><span></span>
+            </div>
+            <h1 class="loader__title">HYPERLANE</h1>
+            <p class="loader__status" id="loading-status">Booting systems</p>
+            <div class="loader__bar" role="progressbar" aria-label="Loading progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="loading-bar">
+              <div class="loader__bar-fill" id="loading-bar-fill"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= MAIN MENU ================= -->
+        <section id="screen-menu" class="screen is-hidden" data-screen="menu" aria-labelledby="menu-title">
+          <div class="menu">
+            <header class="menu__header">
+              <h1 id="menu-title" class="menu__title">HYPER<span>LANE</span></h1>
+              <p class="menu__tagline">Outrun the collapse. Three lanes. No brakes.</p>
+            </header>
+
+            <form class="menu__form" id="menu-form" novalidate>
+              <label class="field">
+                <span class="field__label">Callsign</span>
+                <input
+                  id="username-input"
+                  class="field__input"
+                  type="text"
+                  name="callsign"
+                  autocomplete="off"
+                  autocapitalize="none"
+                  spellcheck="false"
+                  maxlength="24"
+                  placeholder="Enter your callsign"
+                  aria-describedby="username-help"
+                />
+              </label>
+              <p class="field__help" id="username-help">1&ndash;16 characters. Kept for this session only, never stored on your device.</p>
+              <p class="field__error" id="username-error" role="alert" hidden></p>
+
+              <button class="btn btn--primary btn--xl" id="play-button" type="submit">
+                Play
+              </button>
+            </form>
+
+            <div class="menu__meta">
+              <div class="menu__best">
+                <span class="menu__best-label">Best run</span>
+                <strong class="menu__best-value" id="menu-best-score">0</strong>
+                <span class="menu__best-unit">pts</span>
+              </div>
+              <button class="btn btn--ghost" id="settings-open" type="button">
+                Settings
+              </button>
+            </div>
+
+            <ul class="menu__legend" aria-label="Controls summary">
+              <li><kbd>&larr;</kbd><kbd>&rarr;</kbd> lane</li>
+              <li><kbd>&uarr;</kbd>/<kbd>Space</kbd> jump</li>
+              <li><kbd>&darr;</kbd> slide</li>
+              <li class="menu__legend-touch">Swipe to move</li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- ================= HUD ================= -->
+        <div id="hud" class="hud is-hidden" aria-hidden="true">
+          <div class="hud__cluster hud__cluster--left">
+            <div class="hud__stat">
+              <span class="hud__label">Score</span>
+              <strong class="hud__value" id="hud-score">000000</strong>
+            </div>
+            <div class="hud__stat">
+              <span class="hud__label">Flux</span>
+              <strong class="hud__value hud__value--coin" id="hud-coins">0</strong>
+            </div>
+          </div>
+
+          <div class="hud__cluster hud__cluster--right">
+            <div class="hud__stat hud__stat--speed">
+              <span class="hud__label">Speed</span>
+              <strong class="hud__value" id="hud-speed">0</strong>
+              <span class="hud__unit">km/h</span>
+            </div>
+            <button class="btn btn--icon" id="pause-button" type="button" aria-label="Pause game">
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <rect x="6" y="5" width="4" height="14" rx="1.4" />
+                <rect x="14" y="5" width="4" height="14" rx="1.4" />
+              </svg>
+            </button>
+          </div>
+
+          <div class="hud__progress" aria-hidden="true"><div class="hud__progress-fill" id="hud-progress-fill"></div></div>
+        </div>
+
+        <!-- ================= START COUNTDOWN ================= -->
+        <div id="countdown" class="countdown is-hidden" aria-hidden="true">
+          <span class="countdown__value" id="countdown-value">3</span>
+          <span class="countdown__hint" id="countdown-hint">Get ready</span>
+        </div>
+
+        <!-- ================= PAUSE ================= -->
+        <section id="screen-pause" class="screen is-hidden" data-screen="paused" aria-labelledby="pause-title">
+          <div class="panel">
+            <h2 class="panel__title" id="pause-title">Paused</h2>
+            <dl class="panel__stats">
+              <div><dt>Score</dt><dd id="pause-score">0</dd></div>
+              <div><dt>Flux</dt><dd id="pause-coins">0</dd></div>
+            </dl>
+            <div class="panel__actions">
+              <button class="btn btn--primary" id="resume-button" type="button">Resume</button>
+              <button class="btn" id="pause-restart-button" type="button">Restart run</button>
+              <button class="btn" id="pause-settings-button" type="button">Settings</button>
+              <button class="btn btn--ghost" id="pause-menu-button" type="button">Main menu</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= GAME OVER ================= -->
+        <section id="screen-gameover" class="screen is-hidden" data-screen="gameOver" aria-labelledby="gameover-title">
+          <div class="panel panel--wide">
+            <p class="panel__eyebrow">Run terminated</p>
+            <h2 class="panel__title" id="gameover-title">Lane collapsed</h2>
+            <p class="panel__user"><span id="gameover-username"></span> &middot; <span id="gameover-distance">0 m</span></p>
+
+            <div class="panel__grid">
+              <div class="panel__card">
+                <span class="panel__card-label">Score</span>
+                <strong class="panel__card-value" id="gameover-score">0</strong>
+              </div>
+              <div class="panel__card">
+                <span class="panel__card-label">Flux</span>
+                <strong class="panel__card-value" id="gameover-coins">0</strong>
+              </div>
+              <div class="panel__card">
+                <span class="panel__card-label">Best</span>
+                <strong class="panel__card-value" id="gameover-best">0</strong>
+              </div>
+            </div>
+
+            <p class="panel__record is-hidden" id="gameover-record">New personal best</p>
+
+            <div class="panel__actions">
+              <button class="btn btn--primary btn--xl" id="restart-button" type="button">Run again</button>
+              <button class="btn btn--ghost" id="gameover-menu-button" type="button">Main menu</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= SETTINGS ================= -->
+        <section id="settings-panel" class="screen screen--modal is-hidden" data-screen="settings" aria-labelledby="settings-title">
+          <div class="panel">
+            <h2 class="panel__title" id="settings-title">Settings</h2>
+
+            <div class="setting setting--row">
+              <span class="setting__label" id="setting-sfx-label">Sound effects</span>
+              <button class="toggle" id="setting-sound" type="button" role="switch" aria-checked="true" aria-labelledby="setting-sfx-label">
+                <span class="toggle__knob"></span><span class="toggle__text">On</span>
+              </button>
+            </div>
+
+            <div class="setting setting--row">
+              <span class="setting__label" id="setting-music-label">Music</span>
+              <button class="toggle" id="setting-music" type="button" role="switch" aria-checked="true" aria-labelledby="setting-music-label">
+                <span class="toggle__knob"></span><span class="toggle__text">On</span>
+              </button>
+            </div>
+
+            <div class="panel__actions">
+              <button class="btn btn--primary" id="settings-close" type="button">Done</button>
+              <button class="btn btn--ghost" id="settings-reset-best" type="button">Reset best score</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= FATAL ERROR ================= -->
+        <section id="fatal-error" class="screen screen--solid is-hidden" data-screen="error" role="alert">
+          <div class="panel">
+            <h2 class="panel__title">Graphics unavailable</h2>
+            <p class="panel__text" id="fatal-error-message">
+              This browser or device cannot run the 3D version of the game. Please try a modern browser with
+              hardware acceleration enabled.
+            </p>
+          </div>
+        </section>
+
+        <p class="sr-only" id="a11y-announcer" role="status" aria-live="polite"></p>
+      </div>
+    </div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

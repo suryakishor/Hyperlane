@@ -1,0 +1,43 @@
+{
+  "name": "hyperlane",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A browser-based 3D endless runner built with TypeScript, Vite and Three.js, with fully procedural assets and no backend.",
+  "type": "module",
+  "license": "MIT",
+  "author": "suryakishor",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/suryakishor/hyperlane.git"
+  },
+  "bugs": {
+    "url": "https://github.com/suryakishor/hyperlane/issues"
+  },
+  "keywords": [
+    "endless-runner",
+    "threejs",
+    "webgl",
+    "typescript",
+    "vite",
+    "browser-game",
+    "canvas",
+    "procedural-generation"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "npm run typecheck && vite build",
+    "preview": "vite preview --port 4173",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "three": "^0.186.1"
+  },
+  "devDependencies": {
+    "@types/three": "^0.186.0",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.1"
+  }
+}
