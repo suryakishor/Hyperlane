@@ -6,8 +6,6 @@
 [![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite&logoColor=white)](https://vite.dev/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-10b981.svg)](LICENSE)
 
-**Play:** <https://hyperlane-topaz.vercel.app>
-
 A browser-based 3D endless runner built with TypeScript, Vite and Three.js. You
 pilot a courier down an orbital supply lane, dodging hazards and collecting flux
 cells while the lane accelerates until your reflexes give out.
@@ -170,8 +168,6 @@ Useful fields: `state`, `username`, `score`, `coins`, `distance`, `speed`,
 rowsGenerated}`.
 
 ## Deployment
-
-Live at <https://hyperlane-topaz.vercel.app>.
 
 The build is a fully static site — `npm run build` emits `dist/`, which can be
 hosted on any static host (GitHub Pages, Netlify, Cloudflare Pages, or a plain
